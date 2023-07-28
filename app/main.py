@@ -3,7 +3,7 @@ from fastapi import (
     FastAPI,
 )
 
-from routers import (
+from app.routers import (
     dishes,
     menus,
     submenus,

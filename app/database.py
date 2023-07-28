@@ -6,7 +6,7 @@ from sqlalchemy.orm import (
     Session,
 )
 
-from config import (
+from app.config import (
     PG_DB,
     PG_HOST,
     PG_PASSWORD,

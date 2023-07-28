@@ -5,8 +5,8 @@ from sqlalchemy import pool
 
 from alembic import context
 
-import models
-from config import (
+from app import models
+from app.config import (
     PG_DB,
     PG_HOST,
     PG_PASSWORD,

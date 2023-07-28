@@ -4,12 +4,12 @@ from fastapi import Depends
 from starlette import status
 from starlette.exceptions import HTTPException
 
-from models import (
+from app.models import (
     Dish,
     Menu,
     Submenu,
 )
-from services import (
+from app.services import (
     DishesService,
     MenuService,
     SubmenuService,

@@ -7,16 +7,16 @@ from fastapi import (
 )
 from starlette import status
 
-from dependencies import (
+from app.dependencies import (
     valid_menu,
     valid_submenu,
 )
-from models import Menu
-from schemas import (
+from app.models import Menu
+from app.schemas import (
     SubmenuSchemaIn,
     SubmenuSchemaOut,
 )
-from services import SubmenuService
+from app.services import SubmenuService
 
 router = APIRouter(prefix="/menus", tags=["submenus"])
 

@@ -10,14 +10,14 @@ from sqlalchemy import (
 )
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from database import get_async_session
-from models import (
+from app.database import get_async_session
+from app.models import (
     BaseModel,
     Dish,
     Menu,
     Submenu,
 )
-from schemas import (
+from app.schemas import (
     DishSchemaIn,
     MenuSchemaIn,
     SubmenuSchemaIn,
