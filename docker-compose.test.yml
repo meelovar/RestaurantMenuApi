@@ -1,0 +1,32 @@
+version: '3.9'
+
+services:
+  web_api_test:
+    build: .
+    container_name: web_api_test
+    command: sh -c "pytest -v"
+    networks:
+      - menu_api_network_test
+    depends_on:
+      menu_db_test:
+        condition: service_healthy
+
+  menu_db_test:
+    image: postgres:15.1-alpine
+    container_name: menu_db_test
+    environment:
+      - POSTGRES_USER=${DB_USER_TEST}
+      - POSTGRES_PASSWORD=${DB_PASS_TEST}
+      - POSTGRES_DB=${DB_NAME_TEST}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 30s
+      retries: 5
+      start_period: 80s
+    networks:
+      - menu_api_network_test
+
+networks:
+  menu_api_network_test:
+    name: menu_api_network_test
