@@ -48,25 +48,6 @@ async def test_counts_submenus_list_empty(client: AsyncClient, dishes_counts_fix
 
 
 @pytest.mark.asyncio
-async def test_counts_submenus_list_empty(client: AsyncClient, dishes_counts_fixture: dict[str, str]):
-    menu_id = dishes_counts_fixture["menu_id"]
-    response = await client.get(f"/menus/{menu_id}/submenus")
-
-    assert response.status_code == status.HTTP_200_OK
-    assert response.json() == []
-
-
-@pytest.mark.asyncio
-async def test_counts_dishes_list_empty(client: AsyncClient, dishes_counts_fixture: dict[str, str]):
-    menu_id = dishes_counts_fixture["menu_id"]
-    submenu_id = dishes_counts_fixture["submenu_id"]
-    response = await client.get(f"/menus/{menu_id}/submenus/{submenu_id}/dishes")
-
-    assert response.status_code == status.HTTP_200_OK
-    assert response.json() == []
-
-
-@pytest.mark.asyncio
 async def test_counts_dishes_list_empty(client: AsyncClient, dishes_counts_fixture: dict[str, str]):
     menu_id = dishes_counts_fixture["menu_id"]
     submenu_id = dishes_counts_fixture["submenu_id"]
