@@ -27,14 +27,14 @@ async_engine = create_async_engine(DB_TEST_URL_ASYNC)
 
 @dataclasses.dataclass
 class State:
-    id: str = None
-    title: str = None
-    description: str = None
+    id: str | None = None
+    title: str | None = None
+    description: str | None = None
 
 
 @dataclasses.dataclass
 class DishState(State):
-    price: str = None
+    price: str | None = None
 
 
 async def override_get_async_session():
