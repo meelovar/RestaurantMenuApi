@@ -1,21 +1,16 @@
-import abc
-import uuid
-from typing import Type
+from uuid import UUID
 
 from fastapi import Depends
-from sqlalchemy import (
-    delete,
-    select,
-    update,
-)
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.database import get_async_session
 from app.models import (
-    BaseModel,
     Dish,
     Menu,
     Submenu,
+)
+from app.repositories import (
+    DishesRepository,
+    MenuRepository,
+    SubmenuRepository,
 )
 from app.schemas import (
     DishSchemaIn,
@@ -24,123 +19,61 @@ from app.schemas import (
 )
 
 
-class BaseService(metaclass=abc.ABCMeta):
-    def __init__(self, session: AsyncSession = Depends(get_async_session)):
-        self._session = session
+class MenuService:
+    def __init__(self, repo: MenuRepository = Depends()):
+        self.__repo = repo
 
-    @abc.abstractmethod
-    async def get_by_id(self, *ids):
-        pass
+    async def get_by_id(self, menu_id: UUID):
+        return await self.__repo.get_by_id(menu_id)
 
-    @abc.abstractmethod
-    async def get_list(self, *ids):
-        pass
-
-    @abc.abstractmethod
-    async def create(self, *args):
-        pass
-
-    async def update(self, obj, obj_data):
-        query = update(self._obj_class).values(obj_data.model_dump(exclude_unset=True)).where(
-            self._obj_class.id == obj.id
-        )
-
-        await self._session.execute(query)
-        await self._session.commit()
-        await self._session.refresh(obj)
-
-        return obj
-
-    async def delete(self, obj):
-        query = delete(self._obj_class).where(self._obj_class.id == obj.id)
-
-        await self._session.execute(query)
-        await self._session.commit()
-
-    _obj_class: Type[BaseModel]
-
-
-class MenuService(BaseService):
-    async def get_by_id(self, menu_id) -> Menu | None:
-        query = select(Menu).filter(Menu.id == menu_id)
-        result = (await self._session.execute(query)).scalar_one_or_none()
-
-        return result
-
-    async def get_list(self, *ids: uuid.UUID):
-        query = select(self._obj_class).where(*ids)
-        menus = (await self._session.execute(query)).scalars()
-
-        return menus
+    async def get_list(self):
+        return await self.__repo.get_list()
 
     async def create(self, menu_data: MenuSchemaIn):
-        menu_obj = Menu(**menu_data.model_dump())
+        return await self.__repo.create(menu_data)
 
-        self._session.add(menu_obj)
+    async def update(self, menu: Menu, update_data: MenuSchemaIn):
+        return await self.__repo.update(menu, update_data)
 
-        await self._session.commit()
-        await self._session.refresh(menu_obj)
-
-        return menu_obj
-
-    _obj_class = Menu
+    async def delete(self, menu: Menu):
+        return await self.__repo.delete(menu)
 
 
-class SubmenuService(BaseService):
-    async def get_by_id(self, menu_id: uuid.UUID, submenu_id: uuid.UUID) -> Submenu | None:
-        query = select(Submenu).where(Submenu.menu_id == menu_id, Submenu.id == submenu_id)
-        result = (await self._session.execute(query)).scalar_one_or_none()
+class SubmenuService:
+    def __init__(self, repo: SubmenuRepository = Depends()):
+        self.__repo = repo
 
-        return result
+    async def get_by_id(self, menu_id: UUID, submenu_id: UUID):
+        return await self.__repo.get_by_id(menu_id, submenu_id)
 
-    async def get_list(self, menu_id: uuid.UUID):
-        query = select(Submenu).where(Submenu.menu_id == menu_id)
-        submenus = (await self._session.execute(query)).scalars()
+    async def get_list(self, menu_id: UUID):
+        return await self.__repo.get_list(menu_id)
 
-        return submenus
+    async def create(self, menu_id: UUID, submenu_data: SubmenuSchemaIn):
+        return await self.__repo.create(menu_id, submenu_data)
 
-    async def create(self, menu_id: uuid.UUID, submenu_data: SubmenuSchemaIn):
-        submenu = Submenu(**submenu_data.model_dump())
+    async def update(self, submenu: Submenu, update_data: SubmenuSchemaIn):
+        return await self.__repo.update(submenu, update_data)
 
-        submenu.menu_id = menu_id
-
-        self._session.add(submenu)
-
-        await self._session.commit()
-        await self._session.refresh(submenu)
-
-        return submenu
-
-    _obj_class = Submenu
+    async def delete(self, submenu: Submenu):
+        return await self.__repo.delete(submenu)
 
 
-class DishesService(BaseService):
-    async def get_by_id(self, menu_id, submenu_id, dish_id):
-        query = select(Dish).join(Submenu).where(
-            Submenu.id == submenu_id,
-            Submenu.menu_id == menu_id,
-            Dish.id == dish_id
-        )
-        result = (await self._session.execute(query)).scalar_one_or_none()
+class DishesService:
+    def __init__(self, repo: DishesRepository = Depends()):
+        self.__repo = repo
 
-        return result
+    async def get_by_id(self, menu_id: UUID, submenu_id: UUID, dish_id: UUID):
+        return await self.__repo.get_by_id(menu_id, submenu_id, dish_id)
 
-    async def get_list(self, menu_id: uuid.UUID, submenu_id: uuid.UUID):
-        query = select(Dish).join(Submenu).where(Submenu.id == submenu_id, Submenu.menu_id == menu_id)
-        dishes = (await self._session.execute(query)).scalars()
+    async def get_list(self, menu_id: UUID, submenu_id: UUID):
+        return await self.__repo.get_list(menu_id, submenu_id)
 
-        return dishes
+    async def create(self, submenu_id: UUID, dish_data: DishSchemaIn):
+        return await self.__repo.create(submenu_id, dish_data)
 
-    async def create(self, submenu_id: uuid.UUID, dish_data: DishSchemaIn):
-        dish = Dish(**dish_data.model_dump())
+    async def update(self, dish: Dish, update_data: DishSchemaIn):
+        return await self.__repo.update(dish, update_data)
 
-        dish.submenu_id = submenu_id
-
-        self._session.add(dish)
-
-        await self._session.commit()
-        await self._session.refresh(dish)
-
-        return dish
-
-    _obj_class = Dish
+    async def delete(self, dish: Dish):
+        return await self.__repo.delete(dish)
