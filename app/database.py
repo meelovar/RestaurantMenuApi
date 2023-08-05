@@ -1,9 +1,7 @@
 from sqlalchemy.ext.asyncio import (
+    AsyncSession,
     async_sessionmaker,
     create_async_engine,
-)
-from sqlalchemy.orm import (
-    Session,
 )
 
 from app.config import (
@@ -19,7 +17,7 @@ DATABASE_URL_ASYNC = f"postgresql+asyncpg://{PG_USER}:{PG_PASSWORD}@{PG_HOST}:{P
 async_engine = create_async_engine(DATABASE_URL_ASYNC)
 
 
-async def get_async_session() -> Session:
+async def get_async_session() -> AsyncSession:
     async_session = async_sessionmaker(async_engine)
 
     async with async_session() as session:
