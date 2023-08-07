@@ -5,10 +5,7 @@ import pytest
 import pytest_asyncio
 import redis.asyncio as redis
 from httpx import AsyncClient
-from sqlalchemy.ext.asyncio import (
-    async_sessionmaker,
-    create_async_engine,
-)
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from app.config import (
     DB_HOST_TEST,
@@ -18,10 +15,7 @@ from app.config import (
     DB_USER_TEST,
     REDIS_HOST_TEST,
 )
-from app.database import (
-    get_async_session,
-    get_redis_session,
-)
+from app.database import get_async_session, get_redis_session
 from app.main import app
 from app.models import BaseModel
 
