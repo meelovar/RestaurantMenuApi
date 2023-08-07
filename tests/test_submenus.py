@@ -73,7 +73,7 @@ async def test_submenu_delete(client: AsyncClient, menu_id: str, state: State):
 
 @pytest.mark.asyncio
 async def test_submenu_get_404(client: AsyncClient, menu_id: str, state: State):
-    response = await client.delete(f'/menus/{menu_id}/submenus/{state.id}')
+    response = await client.get(f'/menus/{menu_id}/submenus/{state.id}')
 
     assert response.status_code == status.HTTP_404_NOT_FOUND
     assert response.json()['detail'] == 'submenu not found'

@@ -3,8 +3,12 @@ import dataclasses
 
 import pytest
 import pytest_asyncio
+import redis.asyncio as redis
 from httpx import AsyncClient
-from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import (
+    async_sessionmaker,
+    create_async_engine,
+)
 
 from app.config import (
     DB_HOST_TEST,
@@ -12,12 +16,17 @@ from app.config import (
     DB_PASS_TEST,
     DB_PORT_TEST,
     DB_USER_TEST,
+    REDIS_HOST_TEST,
 )
-from app.database import get_async_session
+from app.database import (
+    get_async_session,
+    get_redis_session,
+)
 from app.main import app
 from app.models import BaseModel
 
 DB_TEST_URL_ASYNC = f'postgresql+asyncpg://{DB_USER_TEST}:{DB_PASS_TEST}@{DB_HOST_TEST}:{DB_PORT_TEST}/{DB_NAME_TEST}'
+REDIS_URL = f'redis://{REDIS_HOST_TEST}'
 
 async_engine = create_async_engine(DB_TEST_URL_ASYNC)
 
@@ -38,6 +47,11 @@ async def override_get_async_session():
     async_session = async_sessionmaker(async_engine)
 
     async with async_session() as session:
+        yield session
+
+
+async def override_get_redis_session():
+    async with redis.from_url(REDIS_URL) as session:
         yield session
 
 
@@ -64,6 +78,7 @@ async def prepare_database():
 @pytest_asyncio.fixture(scope='session', name='client')
 async def get_client():
     app.dependency_overrides[get_async_session] = override_get_async_session
+    app.dependency_overrides[get_redis_session] = override_get_redis_session
 
     async with AsyncClient(app=app, base_url='http://localhost/api/v1') as c:
         yield c

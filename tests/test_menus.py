@@ -71,7 +71,7 @@ async def test_menu_delete(client: AsyncClient, state):
 
 @pytest.mark.asyncio
 async def test_menu_get_404(client: AsyncClient, state):
-    response = await client.delete(f'/menus/{state.id}')
+    response = await client.get(f'/menus/{state.id}')
 
     assert response.status_code == status.HTTP_404_NOT_FOUND
     assert response.json()['detail'] == 'menu not found'
