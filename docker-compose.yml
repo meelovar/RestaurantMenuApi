@@ -12,6 +12,8 @@ services:
     depends_on:
       menu_db:
         condition: service_healthy
+      menu_cache:
+        condition: service_healthy
 
   menu_db:
     image: postgres:15.1-alpine
@@ -33,6 +35,22 @@ services:
     networks:
       - menu_api_network
 
+  menu_cache:
+    image: redis:7-alpine
+    container_name: menu_cache
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 30s
+      retries: 5
+      start_period: 80s
+    ports:
+      - '6379:6379'
+    networks:
+      - menu_api_network
+    volumes:
+      - redis_cache:/data
+
 networks:
   menu_api_network:
     name: menu_api_network
@@ -40,3 +58,5 @@ networks:
 volumes:
   db_data:
     name: db_data
+  redis_cache:
+    name: redis_cache
