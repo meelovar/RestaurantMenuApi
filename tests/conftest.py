@@ -14,13 +14,14 @@ from app.config import (
     DB_PORT_TEST,
     DB_USER_TEST,
     REDIS_HOST_TEST,
+    REDIS_PORT_TEST,
 )
 from app.database import get_async_session, get_redis_session
 from app.main import app
 from app.models import BaseModel
 
 DB_TEST_URL_ASYNC = f'postgresql+asyncpg://{DB_USER_TEST}:{DB_PASS_TEST}@{DB_HOST_TEST}:{DB_PORT_TEST}/{DB_NAME_TEST}'
-REDIS_URL = f'redis://{REDIS_HOST_TEST}'
+REDIS_URL = f'redis://{REDIS_HOST_TEST}:{REDIS_PORT_TEST}'
 
 async_engine = create_async_engine(DB_TEST_URL_ASYNC)
 
