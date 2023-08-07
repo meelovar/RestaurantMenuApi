@@ -55,3 +55,8 @@ class DishSpecification(DishListSpecification):
 
     def execute(self) -> BinaryExpression:
         return and_(super().execute(), Dish.id == self.__dish_id)
+
+
+class DishDeleteUpdateSpecification(DishSpecification):
+    def execute(self) -> BinaryExpression:
+        return and_(super().execute(), Menu.id == Submenu.menu_id, Submenu.id == Dish.submenu_id)

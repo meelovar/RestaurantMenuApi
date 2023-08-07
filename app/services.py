@@ -14,6 +14,7 @@ from app.schemas import (
     SubmenuSchemaOut,
 )
 from app.specifications import (
+    DishDeleteUpdateSpecification,
     DishListSpecification,
     DishSpecification,
     MenuSpecification,
@@ -171,7 +172,7 @@ class DishesService:
 
     async def update(self, menu_id: UUID, submenu_id: UUID, dish_id: UUID, update_data: DishSchemaIn) -> Dish:
         cache_keys = f'submenus:{menu_id}:{submenu_id}', f'dishes:{menu_id}:{submenu_id}:{dish_id}'
-        result = await self.__repo.update(DishSpecification(menu_id, submenu_id, dish_id), update_data)
+        result = await self.__repo.update(DishDeleteUpdateSpecification(menu_id, submenu_id, dish_id), update_data)
 
         await self.__cache.delete(*cache_keys)
 
@@ -184,5 +185,5 @@ class DishesService:
             f'dishes:{menu_id}:{submenu_id}', f'dishes:{menu_id}:{submenu_id}:{dish_id}'
         )
 
-        await self.__repo.delete(DishSpecification(menu_id, submenu_id, dish_id))
+        await self.__repo.delete(DishDeleteUpdateSpecification(menu_id, submenu_id, dish_id))
         await self.__cache.delete(*cache_keys)
