@@ -32,21 +32,17 @@ async def get(submenu: Mapping = Depends(valid_submenu)):
 
 
 @router.post("/{menu_id}/submenus", response_model=SubmenuSchemaOut, status_code=status.HTTP_201_CREATED)
-async def create(submenu_data: SubmenuSchemaIn,
-                 menu: Menu = Depends(valid_menu),
-                 submenu_svc: SubmenuService = Depends()):
-    return await submenu_svc.create(menu.id, submenu_data)
+async def create(menu_id: UUID, submenu_data: SubmenuSchemaIn, submenu_svc: SubmenuService = Depends()):
+    return await submenu_svc.create(menu_id, submenu_data)
 
 
 @router.patch("/{menu_id}/submenus/{submenu_id}", response_model=SubmenuSchemaOut)
-async def update(submenu_data: SubmenuSchemaIn,
-                 submenu: Mapping = Depends(valid_submenu),
-                 submenu_svc: SubmenuService = Depends()):
-    return await submenu_svc.update(submenu, submenu_data)
+async def update(menu_id: UUID, submenu_id: UUID, submenu_data: SubmenuSchemaIn, submenu_svc: SubmenuService = Depends()):
+    return await submenu_svc.update(menu_id, submenu_id, submenu_data)
 
 
 @router.delete("/{menu_id}/submenus/{submenu_id}")
-async def delete(submenu: Mapping = Depends(valid_submenu), submenu_svc: SubmenuService = Depends()):
-    await submenu_svc.delete(submenu)
+async def delete(menu_id: UUID, submenu_id: UUID, submenu_svc: SubmenuService = Depends()):
+    await submenu_svc.delete(menu_id, submenu_id)
 
     return {"status": True, "message": "The dish has been deleted"}

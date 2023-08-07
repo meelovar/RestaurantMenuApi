@@ -10,6 +10,8 @@ PG_PASSWORD = os.environ.get("POSTGRES_PASSWORD")
 PG_DB = os.environ.get("POSTGRES_DB")
 PG_PORT = os.environ.get("POSTGRES_PORT")
 
+REDIS_HOST = os.environ.get("REDIS_HOST")
+
 DB_HOST_TEST = os.environ.get("DB_HOST_TEST")
 DB_USER_TEST = os.environ.get("DB_USER_TEST")
 DB_PASS_TEST = os.environ.get("DB_PASS_TEST")

@@ -8,7 +8,9 @@ from typing import (
 import pydantic
 from fastapi import Depends
 from sqlalchemy import (
+    Delete,
     Select,
+    Update,
     delete,
     select,
     update,
@@ -45,7 +47,7 @@ class RepositoryBase(Generic[ModelT], metaclass=abc.ABCMeta):
 
         result = (await self._session.execute(query)).scalars()
 
-        return result
+        return [r for r in result]
 
     async def create(self, data: pydantic.BaseModel, relation_id: uuid.UUID | None = None) -> ModelT:
         obj = self._do_create(data, relation_id)
@@ -57,17 +59,16 @@ class RepositoryBase(Generic[ModelT], metaclass=abc.ABCMeta):
 
         return obj
 
-    async def update(self, obj: ModelT, data: pydantic.BaseModel) -> ModelT:
-        query = update(self._model_cls).values(data.model_dump(exclude_unset=True)).where(self._model_cls.id == obj.id)
+    async def update(self, spec: SpecificationBase, data: pydantic.BaseModel) -> ModelT:
+        query = update(self._model_cls).values(data.model_dump(exclude_unset=True)).where(spec.execute())
 
         await self._session.execute(query)
         await self._session.commit()
-        await self._session.refresh(obj)
 
-        return obj
+        return await self.get(spec)
 
-    async def delete(self, obj: ModelT) -> None:
-        query = delete(self._model_cls).where(self._model_cls.id == obj.id)
+    async def delete(self, spec: SpecificationBase) -> None:
+        query = delete(self._model_cls).where(spec.execute())
 
         await self._session.execute(query)
         await self._session.commit()

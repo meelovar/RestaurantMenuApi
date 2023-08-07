@@ -1,4 +1,4 @@
-from typing import Mapping
+from uuid import UUID
 
 from fastapi import (
     APIRouter,
@@ -7,6 +7,7 @@ from fastapi import (
 from starlette import status
 
 from app.dependencies import valid_menu
+from app.models import Menu
 from app.schemas import (
     MenuSchemaIn,
     MenuSchemaOut,
@@ -24,7 +25,7 @@ async def get_list(menu_svc: MenuService = Depends()):
 
 
 @router.get("/{menu_id}", response_model=MenuSchemaOut)
-async def get(menu: Mapping = Depends(valid_menu)):
+async def get(menu: Menu = Depends(valid_menu)):
     return menu
 
 
@@ -34,12 +35,12 @@ async def create(menu_data: MenuSchemaIn, menu_svc: MenuService = Depends()):
 
 
 @router.patch("/{menu_id}", response_model=MenuSchemaOut)
-async def update(menu_data: MenuSchemaIn, menu: Mapping = Depends(valid_menu), menu_svc: MenuService = Depends()):
-    return await menu_svc.update(menu, menu_data)
+async def update(menu_id: UUID, menu_data: MenuSchemaIn, menu_svc: MenuService = Depends()):
+    return await menu_svc.update(menu_id, menu_data)
 
 
 @router.delete("/{menu_id}")
-async def delete(menu: Mapping = Depends(valid_menu), menu_svc: MenuService = Depends()):
-    await menu_svc.delete(menu)
+async def delete(menu_id: UUID, menu_svc: MenuService = Depends()):
+    await menu_svc.delete(menu_id)
 
     return {"status": True, "message": "The submenu has been deleted"}
