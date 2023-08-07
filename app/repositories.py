@@ -1,32 +1,17 @@
 import abc
 import uuid
-from typing import (
-    Generic,
-    TypeVar,
-)
+from typing import Generic, TypeVar
 
 import pydantic
 from fastapi import Depends
-from sqlalchemy import (
-    Delete,
-    Select,
-    Update,
-    delete,
-    select,
-    update,
-)
+from sqlalchemy import Result, Select, delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_async_session
-from app.models import (
-    BaseModel,
-    Dish,
-    Menu,
-    Submenu,
-)
+from app.models import BaseModel, Dish, Menu, Submenu
 from app.specifications import SpecificationBase
 
-ModelT = TypeVar("ModelT", bound=BaseModel)
+ModelT = TypeVar('ModelT', bound=BaseModel)
 
 
 class RepositoryBase(Generic[ModelT], metaclass=abc.ABCMeta):
@@ -34,12 +19,11 @@ class RepositoryBase(Generic[ModelT], metaclass=abc.ABCMeta):
         self._session = session
 
     async def get(self, spec: SpecificationBase) -> ModelT | None:
-        query = self._get_select_query().where(spec.execute())
-        result = (await self._session.execute(query)).scalar_one_or_none()
+        result = (await self._do_get(spec)).scalar_one_or_none()
 
         return result
 
-    async def get_list(self, spec: SpecificationBase | None = None):
+    async def get_list(self, spec: SpecificationBase | None = None) -> list[ModelT]:
         query = self._get_select_query()
 
         if spec:
@@ -65,7 +49,7 @@ class RepositoryBase(Generic[ModelT], metaclass=abc.ABCMeta):
         await self._session.execute(query)
         await self._session.commit()
 
-        return await self.get(spec)
+        return (await self._do_get(spec)).scalar_one()
 
     async def delete(self, spec: SpecificationBase) -> None:
         query = delete(self._model_cls).where(spec.execute())
@@ -74,6 +58,12 @@ class RepositoryBase(Generic[ModelT], metaclass=abc.ABCMeta):
         await self._session.commit()
 
     _model_cls: type[ModelT]
+
+    async def _do_get(self, spec: SpecificationBase) -> Result:
+        query = self._get_select_query().where(spec.execute())
+        result = await self._session.execute(query)
+
+        return result
 
     @abc.abstractmethod
     def _do_create(self, data: pydantic.BaseModel, relation_id: uuid.UUID | None) -> ModelT:

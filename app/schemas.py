@@ -1,10 +1,7 @@
 from decimal import Decimal
 from uuid import UUID
 
-from pydantic import (
-    BaseModel,
-    ConfigDict,
-)
+from pydantic import BaseModel, ConfigDict
 
 
 class SchemaBase(BaseModel):

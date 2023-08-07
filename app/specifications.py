@@ -1,16 +1,9 @@
 import abc
 import uuid
 
-from sqlalchemy import (
-    BinaryExpression,
-    and_,
-)
+from sqlalchemy import BinaryExpression, and_
 
-from app.models import (
-    Dish,
-    Menu,
-    Submenu,
-)
+from app.models import Dish, Menu, Submenu
 
 
 class SpecificationBase(metaclass=abc.ABCMeta):

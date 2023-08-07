@@ -1,25 +1,12 @@
-from typing import (
-    AsyncIterator,
-)
+from typing import AsyncIterator
 
 import redis.asyncio as redis
-from sqlalchemy.ext.asyncio import (
-    AsyncSession,
-    async_sessionmaker,
-    create_async_engine,
-)
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-from app.config import (
-    PG_DB,
-    PG_HOST,
-    PG_PASSWORD,
-    PG_PORT,
-    PG_USER,
-    REDIS_HOST,
-)
+from app.config import PG_DB, PG_HOST, PG_PASSWORD, PG_PORT, PG_USER, REDIS_HOST
 
-DATABASE_URL_ASYNC = f"postgresql+asyncpg://{PG_USER}:{PG_PASSWORD}@{PG_HOST}:{PG_PORT}/{PG_DB}"
-REDIS_URL = f"redis://{REDIS_HOST}"
+DATABASE_URL_ASYNC = f'postgresql+asyncpg://{PG_USER}:{PG_PASSWORD}@{PG_HOST}:{PG_PORT}/{PG_DB}'
+REDIS_URL = f'redis://{REDIS_HOST}'
 
 async_engine = create_async_engine(DATABASE_URL_ASYNC)
 
