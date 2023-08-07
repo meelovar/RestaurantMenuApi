@@ -10,6 +10,7 @@ from app.database import get_redis_session
 class RedisCache:
     def __init__(self, session: redis.Redis = Depends(get_redis_session)):
         self.__session = session
+        self.__ttl = 700
 
     async def get(self, key: str):
         data = await self.__session.get(key)
@@ -20,7 +21,7 @@ class RedisCache:
     async def set(self, key: str, value):
         data = json.dumps(jsonable_encoder(value))
 
-        await self.__session.set(key, data)
+        await self.__session.setex(key, self.__ttl, data)
 
     async def delete(self, *patterns: str):
         for pattern in patterns:
