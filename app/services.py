@@ -71,7 +71,7 @@ class MenuService:
         return result
 
     async def delete(self, menu_id: UUID) -> None:
-        cache_keys = 'menus', f'menus:{menu_id}'
+        cache_keys = 'menus', f'menus:{menu_id}', f'submenus:{menu_id}*', f'dishes:{menu_id}*'
 
         await self.__repo.delete(MenuSpecification(menu_id))
         await self.__cache.delete(*cache_keys)
@@ -109,7 +109,7 @@ class SubmenuService:
         return result
 
     async def create(self, menu_id: UUID, submenu_data: SubmenuSchemaIn) -> Submenu:
-        cache_keys = 'menus*', f'submenus:{menu_id}'
+        cache_keys = 'menus', f'menus:{menu_id}', f'submenus:{menu_id}'
         submenu = await self.__repo.create(submenu_data, menu_id)
 
         await self.__cache.delete(*cache_keys)
@@ -125,7 +125,11 @@ class SubmenuService:
         return result
 
     async def delete(self, menu_id: UUID, submenu_id: UUID) -> None:
-        cache_keys = 'menus*', f'menus:{menu_id}', f'submenus:{menu_id}*'
+        cache_keys = (
+            'menus', f'menus:{menu_id}',
+            f'submenus:{menu_id}', f'submenus:{menu_id}:{submenu_id}',
+            f'dishes:{menu_id}:{submenu_id}*'
+        )
 
         await self.__repo.delete(SubmenuSpecification(menu_id, submenu_id))
         await self.__cache.delete(*cache_keys)
@@ -171,7 +175,7 @@ class DishesService:
         return dish
 
     async def update(self, menu_id: UUID, submenu_id: UUID, dish_id: UUID, update_data: DishSchemaIn) -> Dish:
-        cache_keys = f'submenus:{menu_id}:{submenu_id}', f'dishes:{menu_id}:{submenu_id}:{dish_id}'
+        cache_keys = f'dishes:{menu_id}:{submenu_id}', f'dishes:{menu_id}:{submenu_id}:{dish_id}'
         result = await self.__repo.update(DishDeleteUpdateSpecification(menu_id, submenu_id, dish_id), update_data)
 
         await self.__cache.delete(*cache_keys)
