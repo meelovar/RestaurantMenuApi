@@ -41,3 +41,18 @@ class DishSchemaIn(BaseModel):
 
 class DishSchemaOut(DishSchemaIn, SchemaBase):
     pass
+
+
+class CatalogSubmenuItemSchema(SchemaBase):
+    title: str
+    description: str
+    dishes: list[DishSchemaOut]
+
+
+class MenuCatalogSchemaOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: UUID
+    title: str
+    description: str
+    submenus: list[CatalogSubmenuItemSchema]

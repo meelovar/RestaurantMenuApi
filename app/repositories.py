@@ -6,6 +6,7 @@ import pydantic
 from fastapi import Depends
 from sqlalchemy import Result, Select, delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
 
 from app.database import get_async_session
 from app.models import BaseModel, Dish, Menu, Submenu
@@ -74,6 +75,12 @@ class RepositoryBase(Generic[ModelT], metaclass=abc.ABCMeta):
 
 
 class MenuRepository(RepositoryBase[Menu]):
+    async def get_catalog(self):
+        query = self._get_select_query().options(joinedload(self._model_cls.submenus).joinedload(Submenu.dishes))
+        result = (await self._session.execute(query)).unique().scalars()
+
+        return result
+
     def _do_create(self, data: pydantic.BaseModel, relation_id: uuid.UUID | None):
         menu = self._model_cls(**data.model_dump())
 

@@ -191,3 +191,14 @@ class DishesService:
 
         await self.__repo.delete(DishDeleteUpdateSpecification(menu_id, submenu_id, dish_id))
         await self.__cache.delete(*cache_keys)
+
+
+class CatalogService:
+    def __init__(self, repo: MenuRepository = Depends(), cache: RedisCache = Depends()):
+        self.__repo = repo
+        self.__cache = cache
+
+    async def get_catalog(self):
+        result = await self.__repo.get_catalog()
+
+        return result
