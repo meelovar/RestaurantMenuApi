@@ -6,7 +6,7 @@ from starlette import status
 from app.dependencies import valid_menu
 from app.models import Menu
 from app.schemas import MenuSchemaIn, MenuSchemaOut
-from app.services import MenuService
+from app.services.menus import MenuService
 
 router = APIRouter(prefix='/menus', tags=['menus'])
 

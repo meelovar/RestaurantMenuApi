@@ -6,7 +6,7 @@ from starlette import status
 
 from app.dependencies import valid_dish
 from app.schemas import DishSchemaIn, DishSchemaOut
-from app.services import DishesService
+from app.services.dishes import DishesService
 
 router = APIRouter(prefix='/menus/{menu_id}/submenus/{submenu_id}/dishes', tags=['dishes'])
 

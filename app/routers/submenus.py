@@ -6,7 +6,7 @@ from starlette import status
 
 from app.dependencies import valid_submenu
 from app.schemas import SubmenuSchemaIn, SubmenuSchemaOut
-from app.services import SubmenuService
+from app.services.submenus import SubmenuService
 
 router = APIRouter(prefix='/menus/{menu_id}/submenus', tags=['submenus'])
 
