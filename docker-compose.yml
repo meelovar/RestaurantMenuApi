@@ -18,6 +18,7 @@ services:
   web_api_celery:
     build: .
     container_name: web_api_celery
+    profiles: ["nonautomatic"]
     command: sh -c "celery -A app.tasks.celery_app:celery_app worker --beat -l INFO"
     volumes:
       - type: bind
@@ -73,6 +74,7 @@ services:
     image: rabbitmq:3.12-management-alpine
     container_name: menu_api_rabbitmq
     hostname: menu_api_rabbitmq
+    profiles: ["nonautomatic"]
     environment:
       - RABBITMQ_DEFAULT_USER=${RABBITMQ_USER}
       - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD}
