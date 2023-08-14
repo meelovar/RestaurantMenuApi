@@ -15,6 +15,24 @@ services:
       menu_cache:
         condition: service_healthy
 
+  web_api_celery:
+    build: .
+    container_name: web_api_celery
+    command: sh -c "celery -A app.tasks.celery_app:celery_app worker --beat -l INFO"
+    volumes:
+      - type: bind
+        source: ./admin/Menu.xlsx
+        target: /app/admin/Menu.xlsx
+    networks:
+      - menu_api_network
+    depends_on:
+      menu_api_rabbitmq:
+        condition: service_healthy
+      menu_db:
+        condition: service_healthy
+      menu_cache:
+        condition: service_healthy
+
   menu_db:
     image: postgres:15.1-alpine
     container_name: menu_db
@@ -31,7 +49,7 @@ services:
       retries: 5
       start_period: 80s
     ports:
-      - '5432:5432'
+      - '5632:5432'
     networks:
       - menu_api_network
 
@@ -50,6 +68,25 @@ services:
       - menu_api_network
     volumes:
       - redis_cache:/data
+
+  menu_api_rabbitmq:
+    image: rabbitmq:3.12-management-alpine
+    container_name: menu_api_rabbitmq
+    hostname: menu_api_rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD}
+      - RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=-rabbit log_levels [{connection,error},{default,error}]
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    networks:
+      - menu_api_network
 
 networks:
   menu_api_network:

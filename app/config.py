@@ -4,6 +4,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+XLSX_PATH = 'admin/Menu.xlsx'
+
 PG_HOST = os.environ.get('POSTGRES_HOST')
 PG_USER = os.environ.get('POSTGRES_USER')
 PG_PASSWORD = os.environ.get('POSTGRES_PASSWORD')
@@ -12,6 +14,11 @@ PG_PORT = os.environ.get('POSTGRES_PORT')
 
 REDIS_HOST = os.environ.get('REDIS_HOST')
 REDIS_PORT = os.environ.get('REDIS_PORT')
+
+RMQ_HOST = os.environ.get('RABBITMQ_HOST')
+RMQ_USER = os.environ.get('RABBITMQ_USER')
+RMQ_PASSWORD = os.environ.get('RABBITMQ_PASSWORD')
+RMQ_PORT = os.environ.get('RABBITMQ_PORT')
 
 DB_HOST_TEST = os.environ.get('DB_HOST_TEST')
 DB_USER_TEST = os.environ.get('DB_USER_TEST')

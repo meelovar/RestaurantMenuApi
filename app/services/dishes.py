@@ -6,7 +6,11 @@ from app.cache import RedisCache
 from app.models import Dish
 from app.repositories import DishesRepository
 from app.schemas import DishSchemaIn, DishSchemaOut
-from app.specifications import DishDeleteUpdateSpecification, DishListSpecification, DishSpecification
+from app.specifications import (
+    DishDeleteUpdateSpecification,
+    DishListSpecification,
+    DishSpecification,
+)
 
 
 class DishesService:

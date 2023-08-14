@@ -6,8 +6,8 @@ from starlette.exceptions import HTTPException
 
 from app.models import Dish, Menu, Submenu
 from app.services.dishes import DishesService
-from app.services.submenus import SubmenuService
 from app.services.menus import MenuService
+from app.services.submenus import SubmenuService
 
 
 async def valid_menu(menu_id: UUID, menu_svc: MenuService = Depends()) -> Menu:

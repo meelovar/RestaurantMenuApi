@@ -1,3 +1,4 @@
+import contextlib
 from typing import AsyncIterator
 
 import redis.asyncio as redis
@@ -16,9 +17,10 @@ from app.config import (
 DATABASE_URL_ASYNC = f'postgresql+asyncpg://{PG_USER}:{PG_PASSWORD}@{PG_HOST}:{PG_PORT}/{PG_DB}'
 REDIS_URL = f'redis://{REDIS_HOST}:{REDIS_PORT}'
 
-async_engine = create_async_engine(DATABASE_URL_ASYNC)
+async_engine = create_async_engine(DATABASE_URL_ASYNC, echo=True)
 
 
+@contextlib.asynccontextmanager
 async def get_async_session() -> AsyncSession:
     async_session = async_sessionmaker(async_engine)
 
@@ -26,6 +28,7 @@ async def get_async_session() -> AsyncSession:
         yield session
 
 
+@contextlib.asynccontextmanager
 async def get_redis_session() -> AsyncIterator[redis.Redis]:
     async with redis.from_url(REDIS_URL) as session:
         yield session

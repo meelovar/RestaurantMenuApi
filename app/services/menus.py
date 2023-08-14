@@ -1,11 +1,12 @@
 from uuid import UUID
 
 from fastapi import Depends
+from pydantic import TypeAdapter
 
 from app.cache import RedisCache
 from app.models import Menu
 from app.repositories import MenuRepository
-from app.schemas import MenuSchemaIn, MenuSchemaOut
+from app.schemas import MenuCatalogSchemaOut, MenuSchemaIn, MenuSchemaOut
 from app.specifications import MenuSpecification
 
 
@@ -70,5 +71,6 @@ class CatalogService:
 
     async def get_catalog(self):
         result = await self.__repo.get_catalog()
+        adapter = TypeAdapter(list[MenuCatalogSchemaOut])
 
-        return result
+        return adapter.validate_python(result)

@@ -4,10 +4,12 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict
 
 
-class SchemaBase(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-
+class IdMixin:
     id: UUID
+
+
+class SchemaBase(IdMixin, BaseModel):
+    model_config = ConfigDict(from_attributes=True)
 
 
 class MenuSchemaBase(BaseModel):
@@ -16,6 +18,10 @@ class MenuSchemaBase(BaseModel):
 
 
 class MenuSchemaIn(MenuSchemaBase):
+    pass
+
+
+class MenuSchemaXlsx(IdMixin, MenuSchemaIn):
     pass
 
 
@@ -29,6 +35,10 @@ class SubmenuSchemaIn(BaseModel):
     description: str
 
 
+class SubmenuSchemaXlsx(IdMixin, SubmenuSchemaIn):
+    pass
+
+
 class SubmenuSchemaOut(SubmenuSchemaIn, SchemaBase):
     dishes_count: int
 
@@ -37,6 +47,10 @@ class DishSchemaIn(BaseModel):
     title: str
     description: str
     price: Decimal
+
+
+class DishSchemaXlsx(IdMixin, DishSchemaIn):
+    pass
 
 
 class DishSchemaOut(DishSchemaIn, SchemaBase):
