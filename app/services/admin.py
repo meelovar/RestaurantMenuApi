@@ -7,7 +7,7 @@ import pandas as pd
 from starlette.background import BackgroundTasks
 
 from app.cache import RedisCache
-from app.database import get_async_session, get_redis_session
+from app.database import get_async_session_cm, get_redis_session_cm
 from app.repositories import DishesRepository, MenuRepository, SubmenuRepository
 from app.schemas import (
     CatalogSubmenuItemSchema,
@@ -25,8 +25,8 @@ from app.services.submenus import SubmenuService
 class AdminService:
     def __init__(self, filename: str):
         self.filename = filename
-        self.db_session = get_async_session
-        self.redis_session = get_redis_session
+        self.db_session = get_async_session_cm
+        self.redis_session = get_redis_session_cm
         self.catalog_svc_cls = CatalogService
         self.menu_svc_cls = MenuService
         self.submenu_svc_cls = SubmenuService

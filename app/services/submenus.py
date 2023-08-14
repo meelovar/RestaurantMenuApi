@@ -51,7 +51,7 @@ class SubmenuService:
         cache_keys = 'menus', f'menus:{menu_id}', f'submenus:{menu_id}', 'catalog'
         submenu = await self.__repo.create(submenu_data, menu_id)
 
-        self.__bg_tasks.add_task(self.__cache.delete, cache_keys)
+        self.__bg_tasks.add_task(self.__cache.delete, *cache_keys)
 
         return submenu
 
@@ -59,7 +59,7 @@ class SubmenuService:
         cache_key = f'submenus:{menu_id}:{submenu_id}', f'submenus:{menu_id}', 'catalog'
         result = await self.__repo.update(SubmenuSpecification(menu_id, submenu_id), update_data)
 
-        self.__bg_tasks.add_task(self.__cache.delete, cache_key)
+        self.__bg_tasks.add_task(self.__cache.delete, *cache_key)
 
         return result
 
@@ -72,4 +72,4 @@ class SubmenuService:
         )
 
         await self.__repo.delete(SubmenuSpecification(menu_id, submenu_id))
-        self.__bg_tasks.add_task(self.__cache.delete, cache_keys)
+        self.__bg_tasks.add_task(self.__cache.delete, *cache_keys)

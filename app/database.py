@@ -21,7 +21,7 @@ async_engine = create_async_engine(DATABASE_URL_ASYNC, echo=True)
 
 
 @contextlib.asynccontextmanager
-async def get_async_session() -> AsyncSession:
+async def get_async_session_cm() -> AsyncSession:
     async_session = async_sessionmaker(async_engine)
 
     async with async_session() as session:
@@ -29,6 +29,16 @@ async def get_async_session() -> AsyncSession:
 
 
 @contextlib.asynccontextmanager
-async def get_redis_session() -> AsyncIterator[redis.Redis]:
+async def get_redis_session_cm() -> AsyncIterator[redis.Redis]:
     async with redis.from_url(REDIS_URL) as session:
+        yield session
+
+
+async def get_async_session() -> AsyncSession:
+    async with get_async_session_cm() as session:
+        yield session
+
+
+async def get_redis_session() -> AsyncIterator[redis.Redis]:
+    async with get_redis_session_cm() as session:
         yield session

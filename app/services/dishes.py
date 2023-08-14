@@ -55,7 +55,7 @@ class DishesService:
         cache_key = 'menus', f'menus:{menu_id}', f'submenus:{menu_id}', f'submenus:{menu_id}:{submenu_id}', 'catalog'
         dish = await self.__repo.create(dish_data, submenu_id)
 
-        self.__bg_tasks.add_task(self.__cache.delete, cache_key)
+        self.__bg_tasks.add_task(self.__cache.delete, *cache_key)
 
         return dish
 
@@ -63,7 +63,7 @@ class DishesService:
         cache_keys = f'dishes:{menu_id}:{submenu_id}', f'dishes:{menu_id}:{submenu_id}:{dish_id}', 'catalog'
         result = await self.__repo.update(DishDeleteUpdateSpecification(menu_id, submenu_id, dish_id), update_data)
 
-        self.__bg_tasks.add_task(self.__cache.delete, cache_keys)
+        self.__bg_tasks.add_task(self.__cache.delete, *cache_keys)
 
         return result
 
@@ -76,4 +76,4 @@ class DishesService:
         )
 
         await self.__repo.delete(DishDeleteUpdateSpecification(menu_id, submenu_id, dish_id))
-        self.__bg_tasks.add_task(self.__cache.delete, cache_keys)
+        self.__bg_tasks.add_task(self.__cache.delete, *cache_keys)

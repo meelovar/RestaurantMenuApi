@@ -52,7 +52,7 @@ class MenuService:
         cache_key = 'menus', 'catalog'
         menu = await self.__repo.create(menu_data)
 
-        self.__bg_tasks.add_task(self.__cache.delete, cache_key)
+        self.__bg_tasks.add_task(self.__cache.delete, *cache_key)
 
         return menu
 
@@ -60,7 +60,7 @@ class MenuService:
         cache_keys = 'menus', f'menus:{menu_id}', 'catalog'
         result = await self.__repo.update(MenuSpecification(menu_id), update_data)
 
-        self.__bg_tasks.add_task(self.__cache.delete, cache_keys)
+        self.__bg_tasks.add_task(self.__cache.delete, *cache_keys)
 
         return result
 
@@ -68,7 +68,7 @@ class MenuService:
         cache_keys = 'menus', f'menus:{menu_id}', f'submenus:{menu_id}*', f'dishes:{menu_id}*', 'catalog'
 
         await self.__repo.delete(MenuSpecification(menu_id))
-        self.__bg_tasks.add_task(self.__cache.delete, cache_keys)
+        self.__bg_tasks.add_task(self.__cache.delete, *cache_keys)
 
 
 class CatalogService:
