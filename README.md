@@ -12,6 +12,9 @@ docker-compose up --build
 docker-compose --profile nonautomatic up --build
 ```
 
+Файл `Menu.xlsx` примонтирован к контейнеру как volume, поэтому изменения
+этого файла на хосте проявляются в контейнере.
+
 # Запуск тестов
 
 ```shell
@@ -37,7 +40,7 @@ select(
     func.count(Dish.id).label('dishes_count')
 ).outerjoin(
     Submenu, Submenu.menu_id == Menu.id
-).(
+).outerjoin(
     Dish, Dish.submenu_id == Submenu.id
 ).group_by(
     Menu.id
