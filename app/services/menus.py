@@ -2,6 +2,7 @@ from uuid import UUID
 
 from fastapi import Depends
 from pydantic import TypeAdapter
+from starlette.background import BackgroundTasks
 
 from app.cache import RedisCache
 from app.models import Menu
@@ -11,7 +12,13 @@ from app.specifications import MenuSpecification
 
 
 class MenuService:
-    def __init__(self, repo: MenuRepository = Depends(), cache: RedisCache = Depends()):
+    def __init__(
+            self,
+            background_tasks: BackgroundTasks,
+            repo: MenuRepository = Depends(),
+            cache: RedisCache = Depends()
+    ):
+        self.__bg_tasks = background_tasks
         self.__repo = repo
         self.__cache = cache
 
@@ -42,26 +49,26 @@ class MenuService:
         return result
 
     async def create(self, menu_data: MenuSchemaIn) -> Menu:
-        cache_key = 'menus'
+        cache_key = 'menus', 'catalog'
         menu = await self.__repo.create(menu_data)
 
-        await self.__cache.delete(cache_key)
+        self.__bg_tasks.add_task(self.__cache.delete, cache_key)
 
         return menu
 
     async def update(self, menu_id: UUID, update_data: MenuSchemaIn) -> Menu:
-        cache_keys = 'menus', f'menus:{menu_id}'
+        cache_keys = 'menus', f'menus:{menu_id}', 'catalog'
         result = await self.__repo.update(MenuSpecification(menu_id), update_data)
 
-        await self.__cache.delete(*cache_keys)
+        self.__bg_tasks.add_task(self.__cache.delete, cache_keys)
 
         return result
 
     async def delete(self, menu_id: UUID) -> None:
-        cache_keys = 'menus', f'menus:{menu_id}', f'submenus:{menu_id}*', f'dishes:{menu_id}*'
+        cache_keys = 'menus', f'menus:{menu_id}', f'submenus:{menu_id}*', f'dishes:{menu_id}*', 'catalog'
 
         await self.__repo.delete(MenuSpecification(menu_id))
-        await self.__cache.delete(*cache_keys)
+        self.__bg_tasks.add_task(self.__cache.delete, cache_keys)
 
 
 class CatalogService:
@@ -70,7 +77,16 @@ class CatalogService:
         self.__cache = cache
 
     async def get_catalog(self):
-        result = await self.__repo.get_catalog()
-        adapter = TypeAdapter(list[MenuCatalogSchemaOut])
+        cache_key = 'catalog'
+        cached = await self.__cache.get(cache_key)
 
-        return adapter.validate_python(result)
+        if not cached:
+            result = await self.__repo.get_catalog()
+            adapter = TypeAdapter(list[MenuCatalogSchemaOut])
+            result = adapter.validate_python(result)
+
+            await self.__cache.set(cache_key, result)
+        else:
+            result = list(map(MenuCatalogSchemaOut.model_validate, cached))
+
+        return result

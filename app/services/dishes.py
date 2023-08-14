@@ -1,6 +1,7 @@
 from uuid import UUID
 
 from fastapi import Depends
+from starlette.background import BackgroundTasks
 
 from app.cache import RedisCache
 from app.models import Dish
@@ -14,7 +15,13 @@ from app.specifications import (
 
 
 class DishesService:
-    def __init__(self, repo: DishesRepository = Depends(), cache: RedisCache = Depends()):
+    def __init__(
+            self,
+            background_tasks: BackgroundTasks,
+            repo: DishesRepository = Depends(),
+            cache: RedisCache = Depends()
+    ):
+        self.__bg_tasks = background_tasks
         self.__repo = repo
         self.__cache = cache
 
@@ -45,18 +52,18 @@ class DishesService:
         return result
 
     async def create(self, menu_id: UUID, submenu_id: UUID, dish_data: DishSchemaIn) -> Dish:
-        cache_key = 'menus', f'menus:{menu_id}', f'submenus:{menu_id}', f'submenus:{menu_id}:{submenu_id}'
+        cache_key = 'menus', f'menus:{menu_id}', f'submenus:{menu_id}', f'submenus:{menu_id}:{submenu_id}', 'catalog'
         dish = await self.__repo.create(dish_data, submenu_id)
 
-        await self.__cache.delete(*cache_key)
+        self.__bg_tasks.add_task(self.__cache.delete, cache_key)
 
         return dish
 
     async def update(self, menu_id: UUID, submenu_id: UUID, dish_id: UUID, update_data: DishSchemaIn) -> Dish:
-        cache_keys = f'dishes:{menu_id}:{submenu_id}', f'dishes:{menu_id}:{submenu_id}:{dish_id}'
+        cache_keys = f'dishes:{menu_id}:{submenu_id}', f'dishes:{menu_id}:{submenu_id}:{dish_id}', 'catalog'
         result = await self.__repo.update(DishDeleteUpdateSpecification(menu_id, submenu_id, dish_id), update_data)
 
-        await self.__cache.delete(*cache_keys)
+        self.__bg_tasks.add_task(self.__cache.delete, cache_keys)
 
         return result
 
@@ -64,8 +71,9 @@ class DishesService:
         cache_keys = (
             'menus', f'menus:{menu_id}',
             f'submenus:{menu_id}', f'submenus:{menu_id}:{submenu_id}',
-            f'dishes:{menu_id}:{submenu_id}', f'dishes:{menu_id}:{submenu_id}:{dish_id}'
+            f'dishes:{menu_id}:{submenu_id}', f'dishes:{menu_id}:{submenu_id}:{dish_id}',
+            'catalog'
         )
 
         await self.__repo.delete(DishDeleteUpdateSpecification(menu_id, submenu_id, dish_id))
-        await self.__cache.delete(*cache_keys)
+        self.__bg_tasks.add_task(self.__cache.delete, cache_keys)

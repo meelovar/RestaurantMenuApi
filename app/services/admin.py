@@ -4,6 +4,7 @@ from typing import Any
 from uuid import UUID
 
 import pandas as pd
+from starlette.background import BackgroundTasks
 
 from app.cache import RedisCache
 from app.database import get_async_session, get_redis_session
@@ -79,9 +80,10 @@ class AdminService:
     async def __sync_db(self) -> None:
         async with self.db_session() as db:
             async with self.redis_session() as redis:
-                menu_service = self.menu_svc_cls(self.menu_repo(db), RedisCache(redis))
-                submenu_service = self.submenu_svc_cls(self.submenu_repo(db), RedisCache(redis))
-                dish_service = self.dish_svc_cls(self.dish_repo(db), RedisCache(redis))
+                background_tasks = BackgroundTasks()
+                menu_service = self.menu_svc_cls(background_tasks, self.menu_repo(db), RedisCache(redis))
+                submenu_service = self.submenu_svc_cls(background_tasks, self.submenu_repo(db), RedisCache(redis))
+                dish_service = self.dish_svc_cls(background_tasks, self.dish_repo(db), RedisCache(redis))
 
                 for menu in self.menus_to_insert.values():
                     await menu_service.create(MenuSchemaXlsx(**menu))

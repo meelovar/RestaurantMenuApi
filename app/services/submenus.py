@@ -1,6 +1,7 @@
 from uuid import UUID
 
 from fastapi import Depends
+from starlette.background import BackgroundTasks
 
 from app.cache import RedisCache
 from app.models import Submenu
@@ -10,7 +11,13 @@ from app.specifications import SubmenuListSpecification, SubmenuSpecification
 
 
 class SubmenuService:
-    def __init__(self, repo: SubmenuRepository = Depends(), cache: RedisCache = Depends()):
+    def __init__(
+            self,
+            background_tasks: BackgroundTasks,
+            repo: SubmenuRepository = Depends(),
+            cache: RedisCache = Depends()
+    ):
+        self.__bg_tasks = background_tasks
         self.__repo = repo
         self.__cache = cache
 
@@ -41,18 +48,18 @@ class SubmenuService:
         return result
 
     async def create(self, menu_id: UUID, submenu_data: SubmenuSchemaIn) -> Submenu:
-        cache_keys = 'menus', f'menus:{menu_id}', f'submenus:{menu_id}'
+        cache_keys = 'menus', f'menus:{menu_id}', f'submenus:{menu_id}', 'catalog'
         submenu = await self.__repo.create(submenu_data, menu_id)
 
-        await self.__cache.delete(*cache_keys)
+        self.__bg_tasks.add_task(self.__cache.delete, cache_keys)
 
         return submenu
 
     async def update(self, menu_id: UUID, submenu_id: UUID, update_data: SubmenuSchemaIn) -> Submenu:
-        cache_key = f'submenus:{menu_id}:{submenu_id}', f'submenus:{menu_id}'
+        cache_key = f'submenus:{menu_id}:{submenu_id}', f'submenus:{menu_id}', 'catalog'
         result = await self.__repo.update(SubmenuSpecification(menu_id, submenu_id), update_data)
 
-        await self.__cache.delete(*cache_key)
+        self.__bg_tasks.add_task(self.__cache.delete, cache_key)
 
         return result
 
@@ -60,8 +67,9 @@ class SubmenuService:
         cache_keys = (
             'menus', f'menus:{menu_id}',
             f'submenus:{menu_id}', f'submenus:{menu_id}:{submenu_id}',
-            f'dishes:{menu_id}:{submenu_id}*'
+            f'dishes:{menu_id}:{submenu_id}*',
+            'catalog'
         )
 
         await self.__repo.delete(SubmenuSpecification(menu_id, submenu_id))
-        await self.__cache.delete(*cache_keys)
+        self.__bg_tasks.add_task(self.__cache.delete, cache_keys)
