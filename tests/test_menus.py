@@ -2,9 +2,11 @@ import pytest
 from httpx import AsyncClient
 from starlette import status
 
+from tests.conftest import State
+
 
 @pytest.mark.asyncio
-async def test_menus_list_empty(client: AsyncClient):
+async def test_menus_list_empty(client: AsyncClient) -> None:
     response = await client.get('/menus')
 
     assert response.status_code == status.HTTP_200_OK
@@ -12,7 +14,7 @@ async def test_menus_list_empty(client: AsyncClient):
 
 
 @pytest.mark.asyncio
-async def test_menu_create(client: AsyncClient, state):
+async def test_menu_create(client: AsyncClient, state: State) -> None:
     menu_data = {
         'title': 'My menu 1',
         'description': 'My menu description 1'
@@ -30,7 +32,7 @@ async def test_menu_create(client: AsyncClient, state):
 
 
 @pytest.mark.asyncio
-async def test_menu_list(client: AsyncClient):
+async def test_menu_list(client: AsyncClient) -> None:
     response = await client.get('/menus')
 
     assert response.status_code == status.HTTP_200_OK
@@ -39,7 +41,7 @@ async def test_menu_list(client: AsyncClient):
 
 
 @pytest.mark.asyncio
-async def test_menu_get(client: AsyncClient, state):
+async def test_menu_get(client: AsyncClient, state: State) -> None:
     response = await client.get(f'/menus/{state.id}')
 
     assert response.status_code == status.HTTP_200_OK
@@ -49,7 +51,7 @@ async def test_menu_get(client: AsyncClient, state):
 
 
 @pytest.mark.asyncio
-async def test_menu_patch(client: AsyncClient, state):
+async def test_menu_patch(client: AsyncClient, state: State) -> None:
     new_menu_data = {
         'title': 'My updated menu 1',
         'description': 'My updated menu description 1'
@@ -63,14 +65,14 @@ async def test_menu_patch(client: AsyncClient, state):
 
 
 @pytest.mark.asyncio
-async def test_menu_delete(client: AsyncClient, state):
+async def test_menu_delete(client: AsyncClient, state: State) -> None:
     response = await client.delete(f'/menus/{state.id}')
 
     assert response.status_code == status.HTTP_200_OK
 
 
 @pytest.mark.asyncio
-async def test_menu_get_404(client: AsyncClient, state):
+async def test_menu_get_404(client: AsyncClient, state: State) -> None:
     response = await client.get(f'/menus/{state.id}')
 
     assert response.status_code == status.HTTP_404_NOT_FOUND

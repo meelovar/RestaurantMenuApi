@@ -7,7 +7,7 @@ router = APIRouter(prefix='/catalog', tags=['catalog'])
 
 
 @router.get('', response_model=list[MenuCatalogSchemaOut])
-async def get_catalog(svc: CatalogService = Depends()):
+async def get_catalog(svc: CatalogService = Depends()) -> list[MenuCatalogSchemaOut]:
     result = await svc.get_catalog()
 
     return result

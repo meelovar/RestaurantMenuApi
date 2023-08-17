@@ -6,7 +6,7 @@ from tests.conftest import DishState
 
 
 @pytest.mark.asyncio
-async def test_dishes_list_empty(client: AsyncClient, menu_and_submenu_ids: dict[str, str]):
+async def test_dishes_list_empty(client: AsyncClient, menu_and_submenu_ids: dict[str, str]) -> None:
     menu_id = menu_and_submenu_ids['menu_id']
     submenu_id = menu_and_submenu_ids['submenu_id']
     response = await client.get(f'/menus/{menu_id}/submenus/{submenu_id}/dishes')
@@ -16,7 +16,7 @@ async def test_dishes_list_empty(client: AsyncClient, menu_and_submenu_ids: dict
 
 
 @pytest.mark.asyncio
-async def test_dishes_create(client: AsyncClient, menu_and_submenu_ids: dict[str, str], dish_state: DishState):
+async def test_dishes_create(client: AsyncClient, menu_and_submenu_ids: dict[str, str], dish_state: DishState) -> None:
     menu_id = menu_and_submenu_ids['menu_id']
     submenu_id = menu_and_submenu_ids['submenu_id']
     dish_data = {
@@ -39,7 +39,7 @@ async def test_dishes_create(client: AsyncClient, menu_and_submenu_ids: dict[str
 
 
 @pytest.mark.asyncio
-async def test_dishes_list(client: AsyncClient, menu_and_submenu_ids: dict[str, str]):
+async def test_dishes_list(client: AsyncClient, menu_and_submenu_ids: dict[str, str]) -> None:
     menu_id = menu_and_submenu_ids['menu_id']
     submenu_id = menu_and_submenu_ids['submenu_id']
     response = await client.get(f'/menus/{menu_id}/submenus/{submenu_id}/dishes')
@@ -50,7 +50,7 @@ async def test_dishes_list(client: AsyncClient, menu_and_submenu_ids: dict[str, 
 
 
 @pytest.mark.asyncio
-async def test_dishes_get(client: AsyncClient, menu_and_submenu_ids: dict[str, str], dish_state: DishState):
+async def test_dishes_get(client: AsyncClient, menu_and_submenu_ids: dict[str, str], dish_state: DishState) -> None:
     menu_id = menu_and_submenu_ids['menu_id']
     submenu_id = menu_and_submenu_ids['submenu_id']
     response = await client.get(f'/menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_state.id}')
@@ -63,7 +63,7 @@ async def test_dishes_get(client: AsyncClient, menu_and_submenu_ids: dict[str, s
 
 
 @pytest.mark.asyncio
-async def test_dishes_patch(client: AsyncClient, menu_and_submenu_ids: dict[str, str], dish_state: DishState):
+async def test_dishes_patch(client: AsyncClient, menu_and_submenu_ids: dict[str, str], dish_state: DishState) -> None:
     dish_data = {
         'title': 'My updated dish 1',
         'description': 'My updated dish description 1',
@@ -81,7 +81,7 @@ async def test_dishes_patch(client: AsyncClient, menu_and_submenu_ids: dict[str,
 
 
 @pytest.mark.asyncio
-async def test_dishes_delete(client: AsyncClient, menu_and_submenu_ids: dict[str, str], dish_state: DishState):
+async def test_dishes_delete(client: AsyncClient, menu_and_submenu_ids: dict[str, str], dish_state: DishState) -> None:
     menu_id = menu_and_submenu_ids['menu_id']
     submenu_id = menu_and_submenu_ids['submenu_id']
     response = await client.delete(f'/menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_state.id}')
@@ -90,7 +90,7 @@ async def test_dishes_delete(client: AsyncClient, menu_and_submenu_ids: dict[str
 
 
 @pytest.mark.asyncio
-async def test_dishes_get_404(client: AsyncClient, menu_and_submenu_ids: dict[str, str], dish_state: DishState):
+async def test_dishes_get_404(client: AsyncClient, menu_and_submenu_ids: dict[str, str], dish_state: DishState) -> None:
     menu_id = menu_and_submenu_ids['menu_id']
     submenu_id = menu_and_submenu_ids['submenu_id']
     response = await client.get(f'/menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_state.id}')

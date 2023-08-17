@@ -1,11 +1,12 @@
 import asyncio
 import dataclasses
+from typing import Any, AsyncGenerator, AsyncIterator, Generator
 
 import pytest
 import pytest_asyncio
 import redis.asyncio as redis
 from httpx import AsyncClient
-from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from app.config import (
     DB_HOST_TEST,
@@ -38,20 +39,20 @@ class DishState(State):
     price: str | None = None
 
 
-async def override_get_async_session():
+async def override_get_async_session() -> AsyncSession:
     async_session = async_sessionmaker(async_engine)
 
     async with async_session() as session:
         yield session
 
 
-async def override_get_redis_session():
+async def override_get_redis_session() -> AsyncIterator[redis.Redis]:
     async with redis.from_url(REDIS_URL) as session:
         yield session
 
 
 @pytest_asyncio.fixture(scope='session')
-def event_loop():
+def event_loop() -> Generator:
     loop = asyncio.get_event_loop_policy().new_event_loop()
 
     yield loop
@@ -60,7 +61,7 @@ def event_loop():
 
 
 @pytest_asyncio.fixture(autouse=True, scope='session')
-async def prepare_database():
+async def prepare_database() -> AsyncGenerator:
     async with async_engine.begin() as conn:
         await conn.run_sync(BaseModel.metadata.create_all)
 
@@ -71,7 +72,7 @@ async def prepare_database():
 
 
 @pytest_asyncio.fixture(scope='session', name='client')
-async def get_client():
+async def get_client() -> AsyncClient:
     app.dependency_overrides[get_async_session] = override_get_async_session
     app.dependency_overrides[get_redis_session] = override_get_redis_session
 
@@ -80,12 +81,12 @@ async def get_client():
 
 
 @pytest.fixture(scope='module', name='state')
-def get_state():
+def get_state() -> Generator[State, Any, None]:
     yield State()
 
 
 @pytest.fixture(scope='module', name='dish_state')
-def get_dish_state():
+def get_dish_state() -> Generator[DishState, Any, None]:
     yield DishState()
 
 
@@ -101,7 +102,7 @@ async def get_menu_id(client: AsyncClient):
 
 
 @pytest_asyncio.fixture(scope='module', name='menu_and_submenu_ids')
-async def get_menu_and_submenu_ids(client: AsyncClient, menu_id: str):
+async def get_menu_and_submenu_ids(client: AsyncClient, menu_id: str) -> AsyncGenerator[dict[str, str], Any]:
     submenu_data = {'title': 'Submenu 1', 'description': 'Submenu 1 description'}
     response = await client.post(f'/menus/{menu_id}/submenus', json=submenu_data)
     result = {
@@ -113,7 +114,10 @@ async def get_menu_and_submenu_ids(client: AsyncClient, menu_id: str):
 
 
 @pytest_asyncio.fixture(scope='module', name='dishes_counts_fixture')
-async def get_dishes_counts_fixture(client: AsyncClient, menu_and_submenu_ids: dict[str, str]):
+async def get_dishes_counts_fixture(
+        client: AsyncClient,
+        menu_and_submenu_ids: dict[str, str]
+) -> AsyncGenerator[dict[str, str], Any]:
     dish_data1 = {
         'title': 'My dish 1',
         'description': 'My dish description 1',

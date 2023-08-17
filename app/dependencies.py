@@ -1,3 +1,4 @@
+from typing import Any
 from uuid import UUID
 
 from fastapi import Depends
@@ -28,7 +29,7 @@ async def valid_dish(menu_id: UUID, submenu_id: UUID, dish_id: UUID, dish_svc: D
     return __raise_404_or_return(dish, 'dish not found')
 
 
-def __raise_404_or_return(obj, message: str):
+def __raise_404_or_return(obj: Any, message: str):
     """Raises 404 HTTP Exception if object is None or returns it"""
     if obj is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, message)

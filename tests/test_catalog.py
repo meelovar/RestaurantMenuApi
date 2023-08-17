@@ -3,7 +3,7 @@ from httpx import AsyncClient
 
 
 @pytest.mark.asyncio
-async def test_catalog_get(client: AsyncClient, dishes_counts_fixture: dict[str, str]):
+async def test_catalog_get(client: AsyncClient, dishes_counts_fixture: dict[str, str]) -> None:
     response = await client.get('/catalog')
     response_json = response.json()
 

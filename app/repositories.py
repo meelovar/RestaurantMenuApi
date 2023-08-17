@@ -4,7 +4,7 @@ from typing import Generic, TypeVar
 
 import pydantic
 from fastapi import Depends
-from sqlalchemy import Result, Select, delete, select, update
+from sqlalchemy import Result, ScalarResult, Select, delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
@@ -75,13 +75,13 @@ class RepositoryBase(Generic[ModelT], metaclass=abc.ABCMeta):
 
 
 class MenuRepository(RepositoryBase[Menu]):
-    async def get_catalog(self):
+    async def get_catalog(self) -> ScalarResult:
         query = self._get_select_query().options(joinedload(self._model_cls.submenus).joinedload(Submenu.dishes))
         result = (await self._session.execute(query)).unique().scalars()
 
         return result
 
-    def _do_create(self, data: pydantic.BaseModel, relation_id: uuid.UUID | None):
+    def _do_create(self, data: pydantic.BaseModel, relation_id: uuid.UUID | None) -> Menu:
         menu = self._model_cls(**data.model_dump())
 
         return menu

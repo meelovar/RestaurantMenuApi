@@ -4,7 +4,7 @@ from starlette import status
 
 
 @pytest.mark.asyncio
-async def test_counts_menu_get(client: AsyncClient, dishes_counts_fixture: dict[str, str]):
+async def test_counts_menu_get(client: AsyncClient, dishes_counts_fixture: dict[str, str]) -> None:
     menu_id = dishes_counts_fixture['menu_id']
     response = await client.get(f'/menus/{menu_id}')
     response_json = response.json()
@@ -16,7 +16,7 @@ async def test_counts_menu_get(client: AsyncClient, dishes_counts_fixture: dict[
 
 
 @pytest.mark.asyncio
-async def test_counts_submenu_get(client: AsyncClient, dishes_counts_fixture: dict[str, str]):
+async def test_counts_submenu_get(client: AsyncClient, dishes_counts_fixture: dict[str, str]) -> None:
     menu_id = dishes_counts_fixture['menu_id']
     submenu_id = dishes_counts_fixture['submenu_id']
     response = await client.get(f'/menus/{menu_id}/submenus/{submenu_id}')
@@ -28,7 +28,7 @@ async def test_counts_submenu_get(client: AsyncClient, dishes_counts_fixture: di
 
 
 @pytest.mark.asyncio
-async def test_counts_submenu_delete_cascade(client: AsyncClient, dishes_counts_fixture: dict[str, str]):
+async def test_counts_submenu_delete_cascade(client: AsyncClient, dishes_counts_fixture: dict[str, str]) -> None:
     menu_id = dishes_counts_fixture['menu_id']
     submenu_id = dishes_counts_fixture['submenu_id']
     response = await client.delete(f'/menus/{menu_id}/submenus/{submenu_id}')
@@ -37,7 +37,7 @@ async def test_counts_submenu_delete_cascade(client: AsyncClient, dishes_counts_
 
 
 @pytest.mark.asyncio
-async def test_counts_submenus_list_empty(client: AsyncClient, dishes_counts_fixture: dict[str, str]):
+async def test_counts_submenus_list_empty(client: AsyncClient, dishes_counts_fixture: dict[str, str]) -> None:
     menu_id = dishes_counts_fixture['menu_id']
     response = await client.get(f'/menus/{menu_id}/submenus')
 
@@ -46,7 +46,7 @@ async def test_counts_submenus_list_empty(client: AsyncClient, dishes_counts_fix
 
 
 @pytest.mark.asyncio
-async def test_counts_dishes_list_empty(client: AsyncClient, dishes_counts_fixture: dict[str, str]):
+async def test_counts_dishes_list_empty(client: AsyncClient, dishes_counts_fixture: dict[str, str]) -> None:
     menu_id = dishes_counts_fixture['menu_id']
     submenu_id = dishes_counts_fixture['submenu_id']
     response = await client.get(f'/menus/{menu_id}/submenus/{submenu_id}/dishes')
@@ -56,7 +56,7 @@ async def test_counts_dishes_list_empty(client: AsyncClient, dishes_counts_fixtu
 
 
 @pytest.mark.asyncio
-async def test_counts_menu_counts_zero(client: AsyncClient, dishes_counts_fixture: dict[str, str]):
+async def test_counts_menu_counts_zero(client: AsyncClient, dishes_counts_fixture: dict[str, str]) -> None:
     menu_id = dishes_counts_fixture['menu_id']
     response = await client.get(f'/menus/{menu_id}')
     response_json = response.json()

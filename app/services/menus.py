@@ -76,7 +76,7 @@ class CatalogService:
         self.__repo = repo
         self.__cache = cache
 
-    async def get_catalog(self):
+    async def get_catalog(self) -> list[MenuCatalogSchemaOut]:
         cache_key = 'catalog'
         cached = await self.__cache.get(cache_key)
 

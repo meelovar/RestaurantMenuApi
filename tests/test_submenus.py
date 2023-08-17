@@ -6,7 +6,7 @@ from tests.conftest import State
 
 
 @pytest.mark.asyncio
-async def test_submenu_empty(client: AsyncClient, menu_id: str):
+async def test_submenu_empty(client: AsyncClient, menu_id: str) -> None:
     response = await client.get(f'/menus/{menu_id}/submenus')
 
     assert response.status_code == status.HTTP_200_OK
@@ -14,7 +14,7 @@ async def test_submenu_empty(client: AsyncClient, menu_id: str):
 
 
 @pytest.mark.asyncio
-async def test_submenu_create(client: AsyncClient, menu_id: str, state: State):
+async def test_submenu_create(client: AsyncClient, menu_id: str, state: State) -> None:
     submenu_data = {
         'title': 'My submenu 1',
         'description': 'My submenu description 1'
@@ -32,7 +32,7 @@ async def test_submenu_create(client: AsyncClient, menu_id: str, state: State):
 
 
 @pytest.mark.asyncio
-async def test_submenu_list(client: AsyncClient, menu_id: str):
+async def test_submenu_list(client: AsyncClient, menu_id: str) -> None:
     response = await client.get(f'/menus/{menu_id}/submenus')
 
     assert response.status_code == status.HTTP_200_OK
@@ -41,7 +41,7 @@ async def test_submenu_list(client: AsyncClient, menu_id: str):
 
 
 @pytest.mark.asyncio
-async def test_submenu_get(client: AsyncClient, menu_id: str, state: State):
+async def test_submenu_get(client: AsyncClient, menu_id: str, state: State) -> None:
     response = await client.get(f'/menus/{menu_id}/submenus/{state.id}')
 
     assert response.status_code == status.HTTP_200_OK
@@ -51,7 +51,7 @@ async def test_submenu_get(client: AsyncClient, menu_id: str, state: State):
 
 
 @pytest.mark.asyncio
-async def test_submenu_patch(client: AsyncClient, menu_id: str, state: State):
+async def test_submenu_patch(client: AsyncClient, menu_id: str, state: State) -> None:
     submenu_data = {
         'title': 'My updated submenu 1',
         'description': 'My updated submenu description 1'
@@ -65,14 +65,14 @@ async def test_submenu_patch(client: AsyncClient, menu_id: str, state: State):
 
 
 @pytest.mark.asyncio
-async def test_submenu_delete(client: AsyncClient, menu_id: str, state: State):
+async def test_submenu_delete(client: AsyncClient, menu_id: str, state: State) -> None:
     response = await client.delete(f'/menus/{menu_id}/submenus/{state.id}')
 
     assert response.status_code == status.HTTP_200_OK
 
 
 @pytest.mark.asyncio
-async def test_submenu_get_404(client: AsyncClient, menu_id: str, state: State):
+async def test_submenu_get_404(client: AsyncClient, menu_id: str, state: State) -> None:
     response = await client.get(f'/menus/{menu_id}/submenus/{state.id}')
 
     assert response.status_code == status.HTTP_404_NOT_FOUND
